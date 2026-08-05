@@ -1,0 +1,199 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Instrument Serif", "Noto Serif SC", serif;
+  --font-sans: "Noto Serif SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  --color-ink: #182c41;
+  --color-champagne: #e9c9a0;
+  --color-night: #0a0e13;
+  --color-night-2: #0d131b;
+  --animate-bob: bob 3s ease-in-out infinite;
+}
+
+/* ---------- 基础 ---------- */
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: "Instrument Serif", "Noto Serif SC", serif;
+  background: #06090c;
+  color: #fff;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+.font-sans {
+  font-family: "Noto Serif SC", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+}
+
+::selection {
+  background: rgba(233, 201, 160, 0.85);
+  color: #182c41;
+}
+
+/* 细滚动条 */
+::-webkit-scrollbar {
+  width: 9px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0e13;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.14);
+  border-radius: 99px;
+  border: 2px solid #0a0e13;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(233, 201, 160, 0.5);
+}
+
+/* ---------- 液态玻璃 ---------- */
+
+.liquid-glass {
+  background: rgba(255, 255, 255, 0.01);
+  background-blend-mode: luminosity;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  border: none;
+  box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.liquid-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.4px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.45) 0%,
+    rgba(255, 255, 255, 0.15) 20%,
+    rgba(255, 255, 255, 0) 40%,
+    rgba(255, 255, 255, 0) 60%,
+    rgba(255, 255, 255, 0.15) 80%,
+    rgba(255, 255, 255, 0.45) 100%
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+/* 深色模式下的液态玻璃（深林视频激活时） */
+.hero-dark .liquid-glass {
+  background: rgba(24, 44, 65, 0.02);
+  box-shadow: inset 0 1px 1px rgba(24, 44, 65, 0.12);
+}
+.hero-dark .liquid-glass::before {
+  background: linear-gradient(
+    180deg,
+    rgba(24, 44, 65, 0.5) 0%,
+    rgba(24, 44, 65, 0.18) 20%,
+    rgba(24, 44, 65, 0) 40%,
+    rgba(24, 44, 65, 0) 60%,
+    rgba(24, 44, 65, 0.18) 80%,
+    rgba(24, 44, 65, 0.5) 100%
+  );
+}
+
+/* ---------- 动画 ---------- */
+
+/* PNG 覆盖层：缓慢上下浮动 + 恒定缩放防止露边 */
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0) scale(1.03);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.03);
+  }
+}
+
+/* 汉堡按钮图标交叉旋转 */
+@keyframes menu-icon-out {
+  from {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: rotate(90deg) scale(0.75);
+    opacity: 0;
+  }
+}
+@keyframes menu-icon-in {
+  from {
+    transform: rotate(-90deg) scale(0.75);
+    opacity: 0;
+  }
+  to {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+.menu-icon-out {
+  animation: menu-icon-out 300ms ease-in-out forwards;
+}
+.menu-icon-in {
+  animation: menu-icon-in 300ms ease-in-out forwards;
+}
+
+/* 视频交叉淡化 */
+@keyframes crossfade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 滚动入场 */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.revealed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 移动端菜单条目 */
+.menu-item {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.menu-open .menu-item {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* hero 内容深色过渡 */
+.hero-content {
+  transition: color 700ms ease;
+}
+
+/* 图片淡入 */
+.img-fade {
+  animation: crossfade 1s ease-in-out both;
+}
+
+/* 细腻噪点纹理（提升质感） */
+.grain::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.35;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+}
