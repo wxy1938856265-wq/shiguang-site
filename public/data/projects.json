@@ -1,0 +1,52 @@
+{
+  "items": [
+    {
+      "name": "Momently",
+      "icon": "calendar",
+      "desc": "一款把待办清单做成\"呼吸灯\"的极简打卡应用。每天只做三件事，做完就让一盏灯亮起来。",
+      "tags": ["React", "TypeScript", "PWA"],
+      "status": "已发布",
+      "color": "amber"
+    },
+    {
+      "name": "GlowBlog",
+      "icon": "feather",
+      "desc": "自托管博客主题：中文衬线排版、极慢的滚动节奏、没有广告和弹窗。写给深夜读书的人。",
+      "tags": ["Tailwind", "Markdown", "主题引擎"],
+      "status": "每周更新",
+      "color": "rose"
+    },
+    {
+      "name": "PingBreath",
+      "icon": "bell",
+      "desc": "浏览器插件：把烦人的通知变成缓慢的呼吸灯。重要消息浮起，噪音沉下去。",
+      "tags": ["Chrome API", "Vite"],
+      "status": "孵化中",
+      "color": "sky"
+    },
+    {
+      "name": "微小频道",
+      "icon": "mic",
+      "desc": "一档没有剪辑的独立播客：每期 15 分钟，聊聊本周做的小东西和路上的见闻。",
+      "tags": ["音频", "RSS", "录音"],
+      "status": "已更 12 期",
+      "color": "violet"
+    },
+    {
+      "name": "ColorDrops",
+      "icon": "palette",
+      "desc": "从一张照片里提取一套高级配色。算法 + 一点点审美，生成可以直接用的 CSS 变量。",
+      "tags": ["Canvas", "色彩算法"],
+      "status": "已发布",
+      "color": "emerald"
+    },
+    {
+      "name": "ShellPoems",
+      "icon": "terminal",
+      "desc": "命令行诗集。`poem --tonight` 会给你一首关于今晚的诗，适合深夜写代码的你。",
+      "tags": ["Node.js", "CLI"],
+      "status": "孵化中",
+      "color": "zinc"
+    }
+  ]
+}

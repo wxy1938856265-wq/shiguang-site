@@ -1,0 +1,119 @@
+# Decap CMS 后台配置
+# 后台入口：https://你的域名/admin
+
+backend:
+  name: git-gateway
+  branch: main
+
+# 图片上传目录（保存在仓库里，部署后自动生效）
+media_folder: public/uploads
+public_folder: /uploads
+
+locale: zh_Hans
+
+collections:
+  # ---------- 网站基本信息 ----------
+  - name: site
+    label: ① 网站信息
+    files:
+      - name: site
+        label: 网站信息（品牌 / Hero 标题 / 关于我 / 页脚）
+        file: public/data/site.json
+        fields:
+          - { label: 品牌名, name: brand, widget: string }
+          - { label: Hero 徽章文案, name: badge, widget: string }
+          - { label: Hero 主标题（第一行）, name: heading1, widget: string }
+          - { label: Hero 主标题（第二行）, name: heading2, widget: string }
+          - { label: Hero 副文案, name: subtext, widget: text }
+          - label: 底部统计（4 项）
+            name: stats
+            widget: list
+            default: ["217 条日常", "9 个小项目", "1,284 杯咖啡", "∞ 份热爱"]
+            field: { label: 统计项, name: stat, widget: string }
+          - { label: 关于我（用 \n 换行）, name: aboutText, widget: text }
+          - label: 技能标签
+            name: skills
+            widget: list
+            default: ["React", "TypeScript"]
+            field: { label: 技能, name: skill, widget: string }
+          - { label: 页脚文字, name: footerNote, widget: string }
+
+  # ---------- 日常（朋友圈） ----------
+  - name: moments
+    label: ② 日常 Moments
+    files:
+      - name: moments
+        label: 日常列表（朋友圈瀑布流）
+        file: public/data/moments.json
+        fields:
+          - label: 日常列表
+            name: items
+            widget: list
+            collapsed: false
+            fields:
+              - { label: 图片, name: img, widget: image, choose_url: true, hint: "点击选择本地图片上传，或直接粘贴图片链接" }
+              - label: 图片比例
+                name: ratio
+                widget: select
+                default: "4/3"
+                options:
+                  - { label: "横版 4:3", value: "4/3" }
+                  - { label: "竖版 3:4", value: "3/4" }
+                  - { label: "方图 1:1", value: "1/1" }
+                  - { label: "长竖 4:5", value: "4/5" }
+                  - { label: "宽幅 16:10", value: "16/10" }
+                  - { label: "电影 16:9", value: "16/9" }
+              - { label: 文案, name: text, widget: text }
+              - { label: 时间与地点, name: meta, widget: string, hint: "例如：昨天 15:04 · 街角的咖啡馆" }
+              - { label: 标签, name: tag, widget: string, hint: "例如：☕ 日常" }
+
+  # ---------- 项目 ----------
+  - name: projects
+    label: ③ 项目 Projects
+    files:
+      - name: projects
+        label: 项目列表
+        file: public/data/projects.json
+        fields:
+          - label: 项目列表
+            name: items
+            widget: list
+            collapsed: false
+            fields:
+              - { label: 项目名称, name: name, widget: string }
+              - label: 图标
+                name: icon
+                widget: select
+                default: rocket
+                options:
+                  - { label: "日历打卡", value: "calendar" }
+                  - { label: "羽毛", value: "feather" }
+                  - { label: "铃铛", value: "bell" }
+                  - { label: "麦克风", value: "mic" }
+                  - { label: "调色板", value: "palette" }
+                  - { label: "终端", value: "terminal" }
+                  - { label: "相机", value: "camera" }
+                  - { label: "咖啡", value: "coffee" }
+                  - { label: "爱心", value: "heart" }
+                  - { label: "火箭", value: "rocket" }
+                  - { label: "书本", value: "book" }
+                  - { label: "地球", value: "globe" }
+                  - { label: "音符", value: "music" }
+              - { label: 描述, name: desc, widget: text }
+              - label: 标签
+                name: tags
+                widget: list
+                default: ["React"]
+                field: { label: 标签, name: tag, widget: string }
+              - { label: 状态, name: status, widget: string, hint: "例如：已发布 / 孵化中" }
+              - label: 配色
+                name: color
+                widget: select
+                default: amber
+                options:
+                  - { label: "琥珀金", value: "amber" }
+                  - { label: "玫瑰", value: "rose" }
+                  - { label: "天蓝", value: "sky" }
+                  - { label: "紫罗兰", value: "violet" }
+                  - { label: "翡翠", value: "emerald" }
+                  - { label: "银灰", value: "zinc" }

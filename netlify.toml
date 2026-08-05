@@ -1,0 +1,15 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# 后台路由 /admin 需要直达 admin/index.html（否则会被 SPA 兜底）
+[[redirects]]
+  from = "/admin/*"
+  to = "/admin/index.html"
+  status = 200
+
+# 其余路径走 SPA
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

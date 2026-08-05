@@ -1,21 +1,32 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
+import type { LucideIcon } from 'lucide-react'
 import {
   ArrowDown,
   ArrowUp,
   Bell,
+  BookOpen,
   CalendarHeart,
+  Camera,
+  Coffee,
   Feather,
   Github,
+  Globe,
+  Heart,
   Instagram,
   Mail,
   Menu,
   Mic,
+  Music,
   Palette,
+  Rocket,
   Rss,
   Sparkles,
   Terminal,
   X,
 } from 'lucide-react'
+import momentsData from '../public/data/moments.json'
+import projectsData from '../public/data/projects.json'
+import siteData from '../public/data/site.json'
 
 /* ============================================================
    素材与数据
@@ -28,124 +39,58 @@ const VIDEOS = [
   { url: 'https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260702_080959_4cac5234-3573-464e-a5b7-76b94b8a7d61.mp4', label: '晨曦', en: 'Quiet Dawn' },
 ]
 
-const U = (id: string, w = 1200) =>
-  `https://images.unsplash.com/${id}?q=80&w=${w}&auto=format&fit=crop`
+type Moment = { img: string; ratio: string; text: string; meta: string; tag: string }
+type Project = { name: string; icon: string; desc: string; tags: string[]; status: string; color: string }
+type Site = {
+  brand: string
+  badge: string
+  heading1: string
+  heading2: string
+  subtext: string
+  stats: string[]
+  aboutText: string
+  skills: string[]
+  footerNote: string
+}
 
-const MOMENTS = [
-  {
-    img: U('photo-1499750310107-5fef28a66643', 1000),
-    ratio: 'aspect-[4/3]',
-    text: '下午三点，咖啡馆只剩我一个人的键盘声。写完了拖延两周的周报，突然觉得，琐碎的日子也有它的重量。',
-    meta: '昨天 15:04 · 街角的咖啡馆',
-    tag: '☕ 日常',
-  },
-  {
-    img: U('photo-1506905925346-21bda4d32df4', 900),
-    ratio: 'aspect-[3/4]',
-    text: '爬了四个小时的山，就为了看这一眼。山顶的风把所有烦恼都吹散了，只剩下"哇"。',
-    meta: '3 天前 · 城郊西山',
-    tag: '🏔️ 周末',
-  },
-  {
-    img: U('photo-1441974231531-c6227db76b6e', 1000),
-    ratio: 'aspect-square',
-    text: '新买的胶片相机第一卷洗出来了。很多张糊掉，这张刚好。摄影大概就是学会接受不完美。',
-    meta: '上周日 · 家附近的小树林',
-    tag: '📷 胶片',
-  },
-  {
-    img: U('photo-1504674900247-0877df9cc836', 1000),
-    ratio: 'aspect-[4/5]',
-    text: '尝试复刻小时候外婆做的糖醋排骨。味道差一点，但厨房里冒热气的感觉，一模一样。',
-    meta: '上周六 · 家',
-    tag: '🍳 下厨',
-  },
-  {
-    img: U('photo-1519681393784-d120267933ba', 1200),
-    ratio: 'aspect-[16/10]',
-    text: '凌晨两点，银河真的肉眼可见。躺在草地上看了十分钟，宇宙这么大，我的 deadline 好像也没那么可怕。',
-    meta: '7 月 12 日 · 露营基地',
-    tag: '🌌 夜晚',
-  },
-  {
-    img: U('photo-1519389950473-47ba0277781c', 1000),
-    ratio: 'aspect-[4/3]',
-    text: '把桌面从"施工现场"收拾成了"灵感车间"。仪式感是生产力的第一推动力。',
-    meta: '7 月 8 日 · 我的书房',
-    tag: '🖥️ 工作台',
-  },
-  {
-    img: U('photo-1523712999610-f77fbcfc3843', 900),
-    ratio: 'aspect-[3/4]',
-    text: '第一次手冲，粉水比全凭感觉，苦得像生活的隐喻。但慢慢喝，回甘也是真的。',
-    meta: '7 月 5 日 · 阳台',
-    tag: '☕ 日常',
-  },
-  {
-    img: U('photo-1472214103451-9374bd1c798e', 1200),
-    ratio: 'aspect-[16/9]',
-    text: '日落把整片稻田镀成金色。想起小时候在田埂上跑，那时觉得天很大，现在觉得时间很快。',
-    meta: '7 月 1 日 · 老家',
-    tag: '🌾 回乡',
-  },
-]
+const FALLBACK_SITE = siteData as Site
 
-const PROJECTS = [
-  {
-    icon: CalendarHeart,
-    name: 'Momently',
-    desc: '一款把待办清单做成"呼吸灯"的极简打卡应用。每天只做三件事，做完就让一盏灯亮起来。',
-    tags: ['React', 'TypeScript', 'PWA'],
-    status: '已发布',
-    grad: 'from-amber-200/25 to-orange-300/10',
-    accent: 'text-amber-200',
-  },
-  {
-    icon: Feather,
-    name: 'GlowBlog',
-    desc: '自托管博客主题：中文衬线排版、极慢的滚动节奏、没有广告和弹窗。写给深夜读书的人。',
-    tags: ['Tailwind', 'Markdown', '主题引擎'],
-    status: '每周更新',
-    grad: 'from-rose-200/25 to-pink-300/10',
-    accent: 'text-rose-200',
-  },
-  {
-    icon: Bell,
-    name: 'PingBreath',
-    desc: '浏览器插件：把烦人的通知变成缓慢的呼吸灯。重要消息浮起，噪音沉下去。',
-    tags: ['Chrome API', 'Vite'],
-    status: '孵化中',
-    grad: 'from-sky-200/25 to-cyan-300/10',
-    accent: 'text-sky-200',
-  },
-  {
-    icon: Mic,
-    name: '微小频道',
-    desc: '一档没有剪辑的独立播客：每期 15 分钟，聊聊本周做的小东西和路上的见闻。',
-    tags: ['音频', 'RSS', '录音'],
-    status: '已更 12 期',
-    grad: 'from-violet-200/25 to-purple-300/10',
-    accent: 'text-violet-200',
-  },
-  {
-    icon: Palette,
-    name: 'ColorDrops',
-    desc: '从一张照片里提取一套高级配色。算法 + 一点点审美，生成可以直接用的 CSS 变量。',
-    tags: ['Canvas', '色彩算法'],
-    status: '已发布',
-    grad: 'from-emerald-200/25 to-teal-300/10',
-    accent: 'text-emerald-200',
-  },
-  {
-    icon: Terminal,
-    name: 'ShellPoems',
-    desc: '命令行诗集。`poem --tonight` 会给你一首关于今晚的诗，适合深夜写代码的你。',
-    tags: ['Node.js', 'CLI'],
-    status: '孵化中',
-    grad: 'from-zinc-200/25 to-slate-300/10',
-    accent: 'text-zinc-200',
-  },
-]
+const FALLBACK_MOMENTS = (momentsData as { items: Moment[] }).items
+const FALLBACK_PROJECTS = (projectsData as { items: Project[] }).items
+
+const RATIO_MAP: Record<string, string> = {
+  '4/3': 'aspect-[4/3]',
+  '3/4': 'aspect-[3/4]',
+  '1/1': 'aspect-square',
+  '4/5': 'aspect-[4/5]',
+  '16/10': 'aspect-[16/10]',
+  '16/9': 'aspect-[16/9]',
+}
+
+const ICON_MAP: Record<string, LucideIcon> = {
+  calendar: CalendarHeart,
+  feather: Feather,
+  bell: Bell,
+  mic: Mic,
+  palette: Palette,
+  terminal: Terminal,
+  camera: Camera,
+  coffee: Coffee,
+  heart: Heart,
+  rocket: Rocket,
+  book: BookOpen,
+  globe: Globe,
+  music: Music,
+}
+
+const COLOR_MAP: Record<string, { grad: string; accent: string }> = {
+  amber: { grad: 'from-amber-200/25 to-orange-300/10', accent: 'text-amber-200' },
+  rose: { grad: 'from-rose-200/25 to-pink-300/10', accent: 'text-rose-200' },
+  sky: { grad: 'from-sky-200/25 to-cyan-300/10', accent: 'text-sky-200' },
+  violet: { grad: 'from-violet-200/25 to-purple-300/10', accent: 'text-violet-200' },
+  emerald: { grad: 'from-emerald-200/25 to-teal-300/10', accent: 'text-emerald-200' },
+  zinc: { grad: 'from-zinc-200/25 to-slate-300/10', accent: 'text-zinc-200' },
+}
 
 const NAV_LINKS = [
   { label: '日常', href: '#moments' },
@@ -185,11 +130,11 @@ function Reveal({ children, className = '', delay = 0 }: { children: ReactNode; 
    Hero
    ============================================================ */
 
-function Nav({ onMenu }: { onMenu: () => void }) {
+function Nav({ onMenu, brand }: { onMenu: () => void; brand: string }) {
   return (
     <header className="relative z-20 flex items-center justify-between px-6 py-6 sm:px-10 md:px-14">
       <a href="#top" className="font-serif text-xl italic tracking-wide text-white sm:text-2xl">
-        拾光<span className="not-italic text-champagne">✦</span>
+        {brand}<span className="not-italic text-champagne">✦</span>
       </a>
 
       {/* 桌面导航 */}
@@ -266,7 +211,7 @@ function MobileMenu({ open, onClose }: { open: boolean; onClose: () => void }) {
   )
 }
 
-function Hero() {
+function Hero({ site }: { site: Site }) {
   const [activeVideo, setActiveVideo] = useState(0)
   const [isTransitioning, setIsTransitioning] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
@@ -320,7 +265,7 @@ function Hero() {
 
       {/* 内容层 */}
       <div className={`hero-content relative z-[2] flex h-full flex-col ${dark ? 'hero-dark' : ''}`}>
-        <Nav onMenu={() => setMenuOpen(true)} />
+        <Nav onMenu={() => setMenuOpen(true)} brand={site.brand} />
         <MobileMenu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
         {/* 中央内容 */}
@@ -328,24 +273,23 @@ function Hero() {
           <div
             className={`liquid-glass hero-tone-dim rounded-full px-5 py-2 font-sans text-[11px] tracking-[0.18em] sm:text-xs ${dark ? 'text-[#182c41]/70' : 'text-white/75'}`}
           >
-            ✦ 我的数字花园 · 记录日常，分享创造
+            ✦ {site.badge}
           </div>
 
           <h1
             className={`hero-tone font-serif mt-7 max-w-4xl text-4xl leading-[1.1] sm:text-5xl md:text-7xl lg:text-[5.5rem] ${dark ? 'text-[#182c41]' : 'text-white'}`}
             style={{ transition: 'color 700ms ease' }}
           >
-            平凡的日子，
+            {site.heading1}
             <br />
-            也闪闪发光
+            {site.heading2}
           </h1>
 
           <p
             className={`hero-tone-dim font-sans mt-6 max-w-xl text-sm leading-relaxed sm:text-base ${dark ? 'text-[#182c41]/75' : 'text-white/80'}`}
             style={{ transition: 'color 700ms ease' }}
           >
-            这里没有算法，只有生活。随手记下的琐碎日常，和认真打磨的小项目 ——
-            像朋友圈一样随意，像作品集一样真诚。
+            {site.subtext}
           </p>
 
           {/* CTA */}
@@ -408,13 +352,12 @@ function Hero() {
         {/* 底部统计（始终白色） */}
         <div className="pb-7 pt-4">
           <div className="font-sans flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-6 text-xs text-white/70 sm:text-sm">
-            <span>217 条日常</span>
-            <span className="hidden text-white/25 sm:inline">|</span>
-            <span>9 个小项目</span>
-            <span className="hidden text-white/25 sm:inline">|</span>
-            <span>1,284 杯咖啡</span>
-            <span className="hidden text-white/25 sm:inline">|</span>
-            <span>∞ 份热爱</span>
+            {site.stats.map((s, i) => (
+              <Fragment key={i}>
+                {i > 0 && <span className="hidden text-white/25 sm:inline">|</span>}
+                <span>{s}</span>
+              </Fragment>
+            ))}
           </div>
         </div>
       </div>
@@ -426,7 +369,7 @@ function Hero() {
    Moments —— 日常（朋友圈风格瀑布流）
    ============================================================ */
 
-function Moments() {
+function Moments({ items }: { items: Moment[] }) {
   return (
     <section id="moments" className="grain relative bg-[#0a0e13] py-24 sm:py-32">
       <div className="mx-auto max-w-6xl px-6 sm:px-10">
@@ -439,10 +382,10 @@ function Moments() {
         </Reveal>
 
         <div className="mt-14 columns-1 gap-6 sm:columns-2 lg:columns-3">
-          {MOMENTS.map((m, i) => (
+          {items.map((m, i) => (
             <Reveal key={i} delay={(i % 3) * 90} className="mb-6 break-inside-avoid">
               <article className="liquid-glass group rounded-3xl p-3 transition-all duration-500 hover:-translate-y-1.5">
-                <div className={`overflow-hidden rounded-2xl ${m.ratio}`}>
+                <div className={`overflow-hidden rounded-2xl ${RATIO_MAP[m.ratio] ?? 'aspect-[4/3]'}`}>
                   <img
                     src={m.img}
                     alt={m.tag}
@@ -476,7 +419,7 @@ function Moments() {
    Projects —— 独立小项目
    ============================================================ */
 
-function Projects() {
+function Projects({ items }: { items: Project[] }) {
   return (
     <section id="projects" className="relative bg-[#0d131b] py-24 sm:py-32">
       <div
@@ -493,37 +436,41 @@ function Projects() {
         </Reveal>
 
         <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {PROJECTS.map((p, i) => (
-            <Reveal key={p.name} delay={(i % 3) * 90}>
-              <article className="liquid-glass group flex h-full flex-col rounded-3xl p-7 transition-all duration-500 hover:-translate-y-1.5">
-                <div className="flex items-start justify-between">
-                  <div
-                    className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br ${p.grad}`}
-                  >
-                    <p.icon size={22} className={p.accent} />
-                  </div>
-                  <span className="font-sans rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-white/60">
-                    {p.status}
-                  </span>
-                </div>
-                <h3 className="font-serif mt-5 text-2xl">{p.name}</h3>
-                <p className="font-sans mt-3 flex-1 text-sm leading-relaxed text-white/60">{p.desc}</p>
-                <div className="mt-5 flex flex-wrap gap-2">
-                  {p.tags.map((t) => (
-                    <span key={t} className="font-sans rounded-full bg-white/5 px-3 py-1 text-[11px] text-white/50">
-                      {t}
+          {items.map((p, i) => {
+            const Icon = ICON_MAP[p.icon] ?? Sparkles
+            const color = COLOR_MAP[p.color] ?? COLOR_MAP.amber
+            return (
+              <Reveal key={p.name} delay={(i % 3) * 90}>
+                <article className="liquid-glass group flex h-full flex-col rounded-3xl p-7 transition-all duration-500 hover:-translate-y-1.5">
+                  <div className="flex items-start justify-between">
+                    <div
+                      className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br ${color.grad}`}
+                    >
+                      <Icon size={22} className={color.accent} />
+                    </div>
+                    <span className="font-sans rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-white/60">
+                      {p.status}
                     </span>
-                  ))}
-                </div>
-                <a
-                  href="#projects"
-                  className="font-sans mt-6 inline-flex items-center gap-1.5 text-sm text-champagne transition-colors hover:text-white"
-                >
-                  了解更多 <ArrowUp size={14} className="rotate-45" />
-                </a>
-              </article>
-            </Reveal>
-          ))}
+                  </div>
+                  <h3 className="font-serif mt-5 text-2xl">{p.name}</h3>
+                  <p className="font-sans mt-3 flex-1 text-sm leading-relaxed text-white/60">{p.desc}</p>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {p.tags.map((t) => (
+                      <span key={t} className="font-sans rounded-full bg-white/5 px-3 py-1 text-[11px] text-white/50">
+                        {t}
+                      </span>
+                    ))}
+                  </div>
+                  <a
+                    href="#projects"
+                    className="font-sans mt-6 inline-flex items-center gap-1.5 text-sm text-champagne transition-colors hover:text-white"
+                  >
+                    了解更多 <ArrowUp size={14} className="rotate-45" />
+                  </a>
+                </article>
+              </Reveal>
+            )
+          })}
         </div>
       </div>
     </section>
@@ -534,7 +481,7 @@ function Projects() {
    About + Footer
    ============================================================ */
 
-function About() {
+function About({ site }: { site: Site }) {
   const links = [
     { icon: Github, label: 'GitHub', href: 'https://github.com' },
     { icon: Instagram, label: 'Instagram', href: 'https://instagram.com' },
@@ -549,12 +496,8 @@ function About() {
           <h2 className="font-serif mt-2 text-4xl sm:text-5xl">关于我</h2>
         </Reveal>
         <Reveal delay={120}>
-          <p className="font-sans mt-8 text-sm leading-loose text-white/65 sm:text-base">
-            你好，我是拾光 —— 白天写代码，傍晚拍云，深夜写点没人看的东西。
-            <br className="hidden sm:block" />
-            这个网站是我的数字花园：日常是随手种下的花，项目是认真搭的小房子。
-            <br className="hidden sm:block" />
-            如果你也喜欢把日子过出光泽，欢迎常来坐坐。
+          <p className="font-sans mt-8 text-sm leading-loose text-white/65 sm:text-base whitespace-pre-line">
+            {site.aboutText}
           </p>
         </Reveal>
         <Reveal delay={200}>
@@ -575,7 +518,7 @@ function About() {
         </Reveal>
         <Reveal delay={280}>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-2">
-            {['React', 'TypeScript', 'Tailwind', 'Node.js', '胶片摄影', '手冲咖啡', '深夜写作'].map((s) => (
+            {site.skills.map((s) => (
               <span key={s} className="font-sans rounded-full border border-white/10 bg-white/5 px-4 py-1.5 text-xs text-white/55">
                 {s}
               </span>
@@ -587,12 +530,12 @@ function About() {
   )
 }
 
-function Footer() {
+function Footer({ site }: { site: Site }) {
   return (
     <footer className="border-t border-white/5 bg-[#06090c] py-10">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-6 sm:flex-row sm:justify-between sm:px-10">
         <p className="font-sans text-xs text-white/40">
-          © 2025 拾光 · 用咖啡因与好奇心搭建
+          {site.footerNote}
         </p>
         <div className="flex items-center gap-6">
           <span className="font-sans flex items-center gap-1.5 text-xs text-white/40">
@@ -616,13 +559,32 @@ function Footer() {
    ============================================================ */
 
 export default function App() {
+  const [moments, setMoments] = useState<Moment[]>(FALLBACK_MOMENTS)
+  const [projects, setProjects] = useState<Project[]>(FALLBACK_PROJECTS)
+  const [site, setSite] = useState<Site>(FALLBACK_SITE)
+
+  useEffect(() => {
+    fetch('/data/moments.json')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('moments fetch failed'))))
+      .then((d) => Array.isArray(d?.items) && setMoments(d.items))
+      .catch(() => {})
+    fetch('/data/projects.json')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('projects fetch failed'))))
+      .then((d) => Array.isArray(d?.items) && setProjects(d.items))
+      .catch(() => {})
+    fetch('/data/site.json')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('site fetch failed'))))
+      .then((d) => d && typeof d === 'object' && setSite(d))
+      .catch(() => {})
+  }, [])
+
   return (
     <main className="bg-[#06090c]">
-      <Hero />
-      <Moments />
-      <Projects />
-      <About />
-      <Footer />
+      <Hero site={site} />
+      <Moments items={moments} />
+      <Projects items={projects} />
+      <About site={site} />
+      <Footer site={site} />
     </main>
   )
 }

@@ -1,33 +1,44 @@
 # 拾光 · 个人独立网站
 
-记录日常琐事（当朋友圈发）+ 分享独立小项目的个人站。单页应用，电影感全屏 Hero + 液态玻璃设计语言。
+记录日常琐事（当朋友圈发）+ 分享独立小项目的个人站。单页应用，电影感全屏 Hero + 液态玻璃设计语言。带 **Decap CMS 后台**，部署在 Netlify 后可在浏览器里可视化编辑所有内容。
 
-## 运行
+## 本地运行
 
 ```bash
 npm install
-npm run dev      # 开发
+npm run dev      # 开发：http://localhost:5173
 npm run build    # 构建
 npm run preview  # 预览构建产物
 ```
 
-## 在哪里改内容
+## 网站数据（后台管理）
 
-所有内容都在 `src/App.tsx` 顶部的数据常量里：
-
-| 常量 | 内容 | 说明 |
+| 文件 | 内容 | 后台栏目 |
 | --- | --- | --- |
-| `VIDEOS` | Hero 背景视频 | URL、中文标签、英文标签（切换器） |
-| `MOMENTS` | 日常卡片 | 图片、文案、时间、标签（朋友圈瀑布流） |
-| `PROJECTS` | 项目卡片 | 图标、名称、描述、标签、状态、渐变配色 |
-| `NAV_LINKS` | 导航链接 | 锚点 + 文案 |
-| About / Footer | 关于我、社交链接 | 页面底部，社交链接是占位符 |
+| `public/data/site.json` | 品牌名、Hero 标题/副文案、底部统计、关于我、技能、页脚 | ① 网站信息 |
+| `public/data/moments.json` | 日常卡片（图片/文案/时间/标签/比例） | ② 日常 Moments |
+| `public/data/projects.json` | 项目卡片（名称/图标/描述/标签/状态/配色） | ③ 项目 Projects |
 
-- 图片用 `U('photo-xxxx', 宽度)` 生成 Unsplash 链接，换 `photo-` ID 即可换图。
-- 品牌名「拾光」、邮箱 `hi@shiguang.dev`、底部统计数字都是占位，替换成自己的。
-- 全局样式（液态玻璃、动画、字体）在 `src/index.css`。
-- Hero 第 3 个视频「深林」激活时，内容会自动切换为深蓝色 `#182C41`（模板特性）。
+- 图片上传后保存在 `public/uploads/`（随仓库一起部署）。
+- 前端加载失败时自动回退到构建时打包的数据，不会白屏。
+- Hero 背景视频在 `src/App.tsx` 的 `VIDEOS` 常量里（如需更换视频才需要改代码）。
+
+## 后台使用
+
+部署到 Netlify 后访问 `https://你的域名/admin`：
+
+1. 首次访问点击 **Sign up** 注册邮箱账号（第一个账号自动成为管理员）
+2. 登录后左侧三个栏目：网站信息 / 日常 Moments / 项目 Projects
+3. 编辑内容 → 点 **Publish** 保存，Netlify 会自动重新构建部署（约 1 分钟），网站更新
+
+## 部署（Netlify）
+
+1. 代码推送到 GitHub 仓库
+2. netlify.com → Add new site → Import from Git → 选择仓库（构建命令已配置在 `netlify.toml`）
+3. Site settings → **Identity** → Enable Identity
+4. Identity → **Services** → Enable **Git Gateway**
+5. 访问 `https://xxx.netlify.app/admin` 注册账号开始编辑
 
 ## 技术栈
 
-Vite · React 19 · TypeScript · Tailwind CSS v4 · lucide-react · Instrument Serif + Noto Serif SC
+Vite · React 19 · TypeScript · Tailwind CSS v4 · lucide-react · Decap CMS · Instrument Serif + Noto Serif SC
