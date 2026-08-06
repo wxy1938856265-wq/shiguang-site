@@ -3,7 +3,7 @@
     {
       "name": "恋爱记录个人站-demo",
       "icon": "heart",
-      "desc": "一款情侣间恋爱记录网站，专属于我们的小小自留地，记录恋爱里细碎的温柔与欢喜，储存每一次见面、心动与日常点滴，把普通的朝夕，慢慢写成我们的故事。https://mengtongli1.netlify.app/",
+      "desc": "一款情侣间恋爱记录网站，专属于我们的小小自留地，记录恋爱里细碎的温柔与欢喜，储存每一次见面、心动与日常点滴，把普通的朝夕，慢慢写成我们的故事。https://mengtongli.netlify.app/",
       "tags": [
         "React",
         "TypeScript",
