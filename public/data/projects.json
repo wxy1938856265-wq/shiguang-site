@@ -1,51 +1,72 @@
 {
   "items": [
     {
-      "name": "Momently",
-      "icon": "calendar",
-      "desc": "一款把待办清单做成\"呼吸灯\"的极简打卡应用。每天只做三件事，做完就让一盏灯亮起来。",
-      "tags": ["React", "TypeScript", "PWA"],
+      "name": "恋爱记录个人站-demo",
+      "icon": "heart",
+      "desc": "一款情侣间恋爱记录网站，专属于我们的小小自留地，记录恋爱里细碎的温柔与欢喜，储存每一次见面、心动与日常点滴，把普通的朝夕，慢慢写成我们的故事。https://mengtongli1.netlify.app/",
+      "tags": [
+        "React",
+        "TypeScript",
+        "PWA"
+      ],
+      "status": "已发布",
+      "color": "rose"
+    },
+    {
+      "name": "AI投研决策系统-demo",
+      "icon": "rocket",
+      "desc": "一套 AI 驱动的投研决策辅助系统，实现资讯解析、数据加工、观点萃取、情景推演一体化，自动处理庞杂市场信息，降低投研信息获取成本，输出辅助决策参考，不构成任何投资建议。获取联系wechat:mengtongli5200",
+      "tags": [
+        "agent",
+        "LLM",
+        "Finance"
+      ],
       "status": "已发布",
       "color": "amber"
     },
     {
-      "name": "GlowBlog",
-      "icon": "feather",
-      "desc": "自托管博客主题：中文衬线排版、极慢的滚动节奏、没有广告和弹窗。写给深夜读书的人。",
-      "tags": ["Tailwind", "Markdown", "主题引擎"],
-      "status": "每周更新",
-      "color": "rose"
-    },
-    {
-      "name": "PingBreath",
+      "name": "项目新建中...",
       "icon": "bell",
-      "desc": "浏览器插件：把烦人的通知变成缓慢的呼吸灯。重要消息浮起，噪音沉下去。",
-      "tags": ["Chrome API", "Vite"],
-      "status": "孵化中",
+      "desc": "x",
+      "tags": [
+        "x",
+        "x"
+      ],
+      "status": "x",
       "color": "sky"
     },
     {
-      "name": "微小频道",
-      "icon": "mic",
-      "desc": "一档没有剪辑的独立播客：每期 15 分钟，聊聊本周做的小东西和路上的见闻。",
-      "tags": ["音频", "RSS", "录音"],
-      "status": "已更 12 期",
+      "name": "项目筹备中...",
+      "icon": "coffee",
+      "desc": "X",
+      "tags": [
+        "X",
+        "X",
+        "X"
+      ],
+      "status": "x",
       "color": "violet"
     },
     {
-      "name": "ColorDrops",
-      "icon": "palette",
-      "desc": "从一张照片里提取一套高级配色。算法 + 一点点审美，生成可以直接用的 CSS 变量。",
-      "tags": ["Canvas", "色彩算法"],
-      "status": "已发布",
+      "name": "项目孵化中...",
+      "icon": "globe",
+      "desc": "x",
+      "tags": [
+        "x",
+        "x"
+      ],
+      "status": "x",
       "color": "emerald"
     },
     {
-      "name": "ShellPoems",
+      "name": "项目立项中...",
       "icon": "terminal",
-      "desc": "命令行诗集。`poem --tonight` 会给你一首关于今晚的诗，适合深夜写代码的你。",
-      "tags": ["Node.js", "CLI"],
-      "status": "孵化中",
+      "desc": "x",
+      "tags": [
+        "x",
+        "x"
+      ],
+      "status": "x",
       "color": "zinc"
     }
   ]
