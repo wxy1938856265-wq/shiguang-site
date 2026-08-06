@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
-import { HashRouter, Link, Route, Routes, useParams } from 'react-router-dom'
+import { BrowserRouter, Link, Route, Routes, useParams } from 'react-router-dom'
 import { marked } from 'marked'
 import DOMPurify from 'dompurify'
 import type { LucideIcon } from 'lucide-react'
@@ -941,12 +941,12 @@ export default function App() {
   }, [])
 
   return (
-    <HashRouter>
+    <BrowserRouter>
       <MusicPlayer />
       <Routes>
         <Route path="/" element={<Home site={site} moments={moments} projects={projects} />} />
         <Route path="/project/:slug" element={<ProjectDetail />} />
       </Routes>
-    </HashRouter>
+    </BrowserRouter>
   )
 }
