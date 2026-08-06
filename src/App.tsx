@@ -598,7 +598,6 @@ function ProjectDetail() {
         >
           <ArrowUp size={14} className="rotate-[-45deg]" /> 返回首页
         </Link>
-        <MusicPlayer />
       </section>
     )
   }
@@ -711,7 +710,6 @@ function ProjectDetail() {
         </div>
       )}
 
-      <MusicPlayer />
     </section>
   )
 }
