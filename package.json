@@ -10,10 +10,13 @@
   },
   "dependencies": {
     "@types/netlify-identity-widget": "^1.9.7",
+    "dompurify": "^3.4.13",
     "lucide-react": "^0.469.0",
+    "marked": "^18.0.9",
     "netlify-identity-widget": "^1.9.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.18.2"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.0.0",

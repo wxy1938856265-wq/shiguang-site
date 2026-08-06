@@ -1,4 +1,7 @@
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
+import { HashRouter, Link, Route, Routes, useParams } from 'react-router-dom'
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
 import type { LucideIcon } from 'lucide-react'
 import {
   ArrowDown,
@@ -43,7 +46,18 @@ const VIDEOS = [
 ]
 
 type Moment = { img: string; ratio: string; text: string; meta: string; tag: string }
-type Project = { name: string; icon: string; desc: string; tags: string[]; status: string; color: string }
+type Project = {
+  name: string
+  slug?: string
+  icon: string
+  desc: string
+  tags: string[]
+  status: string
+  color: string
+  body?: string
+  gallery?: string[]
+  links?: { label: string; url: string }[]
+}
 type Site = {
   brand: string
   badge: string
@@ -464,12 +478,12 @@ function Projects({ items }: { items: Project[] }) {
                       </span>
                     ))}
                   </div>
-                  <a
-                    href="#projects"
+                  <Link
+                    to={`/project/${p.slug ?? encodeURIComponent(p.name)}`}
                     className="font-sans mt-6 inline-flex items-center gap-1.5 text-sm text-champagne transition-colors hover:text-white"
                   >
                     了解更多 <ArrowUp size={14} className="rotate-45" />
-                  </a>
+                  </Link>
                 </article>
               </Reveal>
             )
@@ -554,6 +568,151 @@ function Footer({ site }: { site: Site }) {
         </div>
       </div>
     </footer>
+  )
+}
+
+/* ============================================================
+   ProjectDetail —— 项目详情页
+   ============================================================ */
+
+function ProjectDetail() {
+  const { slug = '' } = useParams()
+  const [projects, setProjects] = useState<Project[]>(FALLBACK_PROJECTS)
+  const [lightbox, setLightbox] = useState<string | null>(null)
+
+  useEffect(() => {
+    fetch('/data/projects.json')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('projects fetch failed'))))
+      .then((d) => Array.isArray(d?.items) && setProjects(d.items))
+      .catch(() => {})
+  }, [])
+
+  const p = projects.find((x) => (x.slug ?? x.name) === slug)
+  if (!p) {
+    return (
+      <section className="grain relative flex min-h-screen flex-col items-center justify-center bg-[#0a0e13] px-6 text-center">
+        <p className="font-serif text-3xl italic text-white/60">项目不存在或已被删除</p>
+        <Link
+          to="/"
+          className="liquid-glass font-sans mt-8 inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm text-white/85 transition-colors hover:text-champagne"
+        >
+          <ArrowUp size={14} className="rotate-[-45deg]" /> 返回首页
+        </Link>
+        <MusicPlayer />
+      </section>
+    )
+  }
+
+  const color = COLOR_MAP[p.color] ?? COLOR_MAP.amber
+  const Icon = ICON_MAP[p.icon] ?? Sparkles
+  const html = p.body ? (DOMPurify.sanitize(marked.parse(p.body, { async: false }) as string) as string) : ''
+
+  return (
+    <section className="grain relative min-h-screen bg-[#0a0e13]">
+      {/* 顶栏 */}
+      <header className="relative z-20 flex items-center justify-between px-6 py-6 sm:px-10 md:px-14">
+        <Link to="/" className="font-serif text-xl italic tracking-wide text-white sm:text-2xl">
+          拾光<span className="not-italic text-champagne">✦</span>
+        </Link>
+        <Link
+          to="/"
+          className="liquid-glass font-sans flex items-center gap-2 rounded-full px-5 py-2 text-sm text-white/80 transition-colors hover:text-white"
+        >
+          <ArrowUp size={14} className="rotate-[-45deg]" /> 返回首页
+        </Link>
+      </header>
+
+      <div className="relative mx-auto max-w-3xl px-6 pb-36 pt-10 sm:px-10">
+        {/* 项目头部 */}
+        <Reveal>
+          <div className="flex items-center gap-3">
+            <div className={`flex h-12 w-12 items-center justify-center rounded-2xl border border-white/10 bg-gradient-to-br ${color.grad}`}>
+              <Icon size={22} className={color.accent} />
+            </div>
+            <span className="font-sans rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[11px] text-white/60">
+              {p.status}
+            </span>
+          </div>
+          <h1 className="font-serif mt-5 text-4xl sm:text-5xl">{p.name}</h1>
+          <p className="font-sans mt-5 text-sm leading-relaxed text-white/65 sm:text-base">{p.desc}</p>
+          <div className="mt-5 flex flex-wrap gap-2">
+            {p.tags.map((t) => (
+              <span key={t} className="font-sans rounded-full bg-white/5 px-3 py-1 text-[11px] text-white/50">
+                {t}
+              </span>
+            ))}
+          </div>
+          {p.links && p.links.length > 0 && (
+            <div className="mt-8 flex flex-wrap gap-3">
+              {p.links.map((l) => (
+                <a
+                  key={l.label}
+                  href={l.url}
+                  target={l.url.startsWith('http') ? '_blank' : undefined}
+                  rel="noreferrer"
+                  className="font-sans inline-flex items-center gap-1.5 rounded-full bg-white px-6 py-2.5 text-sm font-medium text-[#182c41] transition-all duration-300 hover:opacity-90"
+                >
+                  {l.label} <ArrowUp size={14} className="rotate-45" />
+                </a>
+              ))}
+            </div>
+          )}
+        </Reveal>
+
+        {/* 图片画廊 */}
+        {p.gallery && p.gallery.length > 0 && (
+          <Reveal delay={100}>
+            <div className="mt-12 grid grid-cols-1 gap-4 sm:grid-cols-2">
+              {p.gallery.map((img, i) => (
+                <button
+                  key={i}
+                  onClick={() => setLightbox(img)}
+                  className={`group overflow-hidden rounded-2xl border border-white/10 ${i === 0 ? 'sm:col-span-2' : ''}`}
+                >
+                  <img
+                    src={img}
+                    alt={`${p.name} ${i + 1}`}
+                    loading="lazy"
+                    className="img-fade aspect-[16/10] w-full object-cover transition-transform duration-700 group-hover:scale-[1.03]"
+                  />
+                </button>
+              ))}
+            </div>
+          </Reveal>
+        )}
+
+        {/* 正文（Markdown） */}
+        {html && (
+          <Reveal delay={150}>
+            <div
+              className="prose-dark liquid-glass mt-12 rounded-3xl px-6 py-8 sm:px-9"
+              dangerouslySetInnerHTML={{ __html: html }}
+            />
+          </Reveal>
+        )}
+
+        <Reveal delay={200} className="mt-14 text-center">
+          <Link
+            to="/"
+            className="liquid-glass font-sans inline-flex items-center gap-2 rounded-full px-7 py-3 text-sm text-white/85 transition-colors hover:text-champagne"
+          >
+            <ArrowUp size={14} className="rotate-[-45deg]" /> 返回项目列表
+          </Link>
+        </Reveal>
+      </div>
+
+      {/* 大图预览 */}
+      {lightbox && (
+        <div
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-black/90 p-6 backdrop-blur-sm"
+          onClick={() => setLightbox(null)}
+        >
+          <img src={lightbox} alt="预览" className="img-fade max-h-[90vh] max-w-full rounded-2xl" />
+        </div>
+      )}
+
+      <MusicPlayer />
+    </section>
   )
 }
 
@@ -751,6 +910,18 @@ function MusicPlayer() {
    App
    ============================================================ */
 
+function Home({ site, moments, projects }: { site: Site; moments: Moment[]; projects: Project[] }) {
+  return (
+    <main className="bg-[#06090c]">
+      <Hero site={site} />
+      <Moments items={moments} />
+      <Projects items={projects} />
+      <About site={site} />
+      <Footer site={site} />
+    </main>
+  )
+}
+
 export default function App() {
   const [moments, setMoments] = useState<Moment[]>(FALLBACK_MOMENTS)
   const [projects, setProjects] = useState<Project[]>(FALLBACK_PROJECTS)
@@ -772,13 +943,12 @@ export default function App() {
   }, [])
 
   return (
-    <main className="bg-[#06090c]">
-      <Hero site={site} />
-      <Moments items={moments} />
-      <Projects items={projects} />
-      <About site={site} />
-      <Footer site={site} />
+    <HashRouter>
       <MusicPlayer />
-    </main>
+      <Routes>
+        <Route path="/" element={<Home site={site} moments={moments} projects={projects} />} />
+        <Route path="/project/:slug" element={<ProjectDetail />} />
+      </Routes>
+    </HashRouter>
   )
 }

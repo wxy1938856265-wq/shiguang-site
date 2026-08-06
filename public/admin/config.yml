@@ -81,6 +81,7 @@ collections:
             collapsed: false
             fields:
               - { label: 项目名称, name: name, widget: string }
+              - { label: 网址标识 slug, name: slug, widget: string, hint: "英文小写，如 love-journal（用于详情页网址，不可重复）" }
               - label: 图标
                 name: icon
                 widget: select
@@ -99,7 +100,7 @@ collections:
                   - { label: "书本", value: "book" }
                   - { label: "地球", value: "globe" }
                   - { label: "音符", value: "music" }
-              - { label: 描述, name: desc, widget: text }
+              - { label: 一句话描述, name: desc, widget: text }
               - label: 标签
                 name: tags
                 widget: list
@@ -117,3 +118,17 @@ collections:
                   - { label: "紫罗兰", value: "violet" }
                   - { label: "翡翠", value: "emerald" }
                   - { label: "银灰", value: "zinc" }
+              - { label: "详情正文（Markdown）", name: body, widget: markdown, hint: "支持 # 标题、**加粗**、- 列表、> 引用，空行分段" }
+              - label: "展示图片（画廊）"
+                name: gallery
+                widget: list
+                default: []
+                field: { label: 图片, name: img, widget: image, choose_url: true }
+              - label: 链接按钮
+                name: links
+                widget: list
+                default: []
+                collapsed: true
+                fields:
+                  - { label: 按钮文字, name: label, widget: string }
+                  - { label: 网址, name: url, widget: string, hint: "https:// 或 mailto: 开头" }
