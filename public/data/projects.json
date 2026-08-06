@@ -1,85 +1,114 @@
 {
   "items": [
     {
+      "body": "## 关于这个项目\n\n这是一款专属于两个人的恋爱记录网站，像一个小小的自留地，收藏恋爱里的细碎温柔。\n\n### 功能亮点\n\n- 记录每一次见面、心动与日常点滴\n- 私密的双人空间，只属于我们\n- 支持离线访问，随时随地翻看回忆\n\n### 技术栈\n\nReact · TypeScript · PWA，移动端优先设计。\n\n> 正在不断迭代中，欢迎给我提建议 :)",
+      "color": "rose",
       "name": "恋爱记录个人站-demo",
       "slug": "love-journal",
-      "icon": "heart",
       "desc": "一款情侣间恋爱记录网站，专属于我们的小小自留地，记录恋爱里细碎的温柔与欢喜，储存每一次见面、心动与日常点滴，把普通的朝夕，慢慢写成我们的故事。",
-      "tags": ["React", "TypeScript", "PWA"],
-      "status": "已发布",
-      "color": "rose",
-      "body": "## 关于这个项目\n\n这是一款专属于两个人的恋爱记录网站，像一个小小的自留地，收藏恋爱里的细碎温柔。\n\n### 功能亮点\n\n- 记录每一次见面、心动与日常点滴\n- 私密的双人空间，只属于我们\n- 支持离线访问，随时随地翻看回忆\n\n### 技术栈\n\nReact · TypeScript · PWA，移动端优先设计。\n\n> 正在不断迭代中，欢迎给我提建议 :)",
       "gallery": [
-        "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?q=80&w=1200&auto=format&fit=crop"
+        "/uploads/屏幕截图-2026-08-06-174012.png",
+        "/uploads/屏幕截图-2026-08-06-174102.png",
+        "https://images.unsplash.com/photo-1518199266791-5375a83190b7?q=80&w=1200&auto=format&fit=crop"
       ],
-      "links": [{ "label": "访问网站", "url": "https://mengtongli.netlify.app/" }]
+      "status": "已发布",
+      "tags": [
+        "React",
+        "TypeScript",
+        "PWA"
+      ],
+      "icon": "heart",
+      "links": [
+        {
+          "label": "访问网站",
+          "url": "https://mengtongli.netlify.app/"
+        }
+      ]
     },
     {
+      "body": "## 关于这个项目\n\n一套 AI 驱动的投研决策辅助系统，面向信息过载时代的投资研究场景，把庞杂的市场信息交给机器，把判断留给人。\n\n### 核心能力\n\n* **资讯解析**：自动抓取并结构化海量市场信息\n* **数据加工**：清洗、对齐、标注多源数据\n* **观点萃取**：从噪音中提炼关键观点与逻辑链条\n* **情景推演**：多情景假设推演，输出辅助决策参考\n\n### 说明\n\n本系统输出仅为辅助决策参考，不构成任何投资建议。\n\n获取联系 wechat: mengtongli5200\n\n\\    QQ:1938856265",
+      "color": "amber",
       "name": "AI投研决策系统-demo",
       "slug": "ai-invest",
-      "icon": "rocket",
       "desc": "一套 AI 驱动的投研决策辅助系统，实现资讯解析、数据加工、观点萃取、情景推演一体化，自动处理庞杂市场信息，降低投研信息获取成本，输出辅助决策参考，不构成任何投资建议。",
-      "tags": ["agent", "LLM", "Finance"],
-      "status": "已发布",
-      "color": "amber",
-      "body": "## 关于这个项目\n\n一套 AI 驱动的投研决策辅助系统，面向信息过载时代的投资研究场景，把庞杂的市场信息交给机器，把判断留给人。\n\n### 核心能力\n\n- **资讯解析**：自动抓取并结构化海量市场信息\n- **数据加工**：清洗、对齐、标注多源数据\n- **观点萃取**：从噪音中提炼关键观点与逻辑链条\n- **情景推演**：多情景假设推演，输出辅助决策参考\n\n### 说明\n\n本系统输出仅为辅助决策参考，不构成任何投资建议。\n\n获取联系 wechat: mengtongli5200",
       "gallery": [
         "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1642790106117-e829e14a795f?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1551288049-bebda4e38f71?q=80&w=1200&auto=format&fit=crop",
-        "https://images.unsplash.com/photo-1460925895917-afdab827c52f?q=80&w=1200&auto=format&fit=crop"
+        "/uploads/f551693cb290f132caa2660f70ada2bf.jpg",
+        "/uploads/3e75aef3f4f3c3cc942045a52415a173.jpg"
       ],
-      "links": [{ "label": "联系咨询", "url": "mailto:hi@shiguang.dev" }]
+      "status": "已发布",
+      "tags": [
+        "agent",
+        "LLM",
+        "Finance"
+      ],
+      "icon": "rocket",
+      "links": [
+        {
+          "label": "联系咨询",
+          "url": "mailto:1938856265@qq.com"
+        }
+      ]
     },
     {
+      "body": "### 项目筹备中\n\n这个项目还在酝酿阶段，等它长出来再和大家见面。\n\n敬请期待 :)",
+      "color": "sky",
       "name": "项目新建中...",
       "slug": "wip-1",
-      "icon": "bell",
       "desc": "x",
-      "tags": ["x", "x"],
-      "status": "x",
-      "color": "sky",
-      "body": "### 项目筹备中\n\n这个项目还在酝酿阶段，等它长出来再和大家见面。\n\n敬请期待 :)",
       "gallery": [],
+      "status": "x",
+      "tags": [
+        "x",
+        "x"
+      ],
+      "icon": "bell",
       "links": []
     },
     {
+      "body": "### 项目筹备中\n\n这个项目还在酝酿阶段，等它长出来再和大家见面。\n\n敬请期待 :)",
+      "color": "violet",
       "name": "项目筹备中...",
       "slug": "wip-2",
-      "icon": "coffee",
       "desc": "X",
-      "tags": ["X", "X", "X"],
-      "status": "x",
-      "color": "violet",
-      "body": "### 项目筹备中\n\n这个项目还在酝酿阶段，等它长出来再和大家见面。\n\n敬请期待 :)",
       "gallery": [],
+      "status": "x",
+      "tags": [
+        "X",
+        "X",
+        "X"
+      ],
+      "icon": "coffee",
       "links": []
     },
     {
+      "body": "### 项目筹备中\n\n这个项目还在酝酿阶段，等它长出来再和大家见面。\n\n敬请期待 :)",
+      "color": "emerald",
       "name": "项目孵化中...",
       "slug": "wip-3",
-      "icon": "globe",
       "desc": "x",
-      "tags": ["x", "x"],
-      "status": "x",
-      "color": "emerald",
-      "body": "### 项目筹备中\n\n这个项目还在酝酿阶段，等它长出来再和大家见面。\n\n敬请期待 :)",
       "gallery": [],
+      "status": "x",
+      "tags": [
+        "x",
+        "x"
+      ],
+      "icon": "globe",
       "links": []
     },
     {
+      "body": "### 项目筹备中\n\n这个项目还在酝酿阶段，等它长出来再和大家见面。\n\n敬请期待 :)",
+      "color": "zinc",
       "name": "项目立项中...",
       "slug": "wip-4",
-      "icon": "terminal",
       "desc": "x",
-      "tags": ["x", "x"],
-      "status": "x",
-      "color": "zinc",
-      "body": "### 项目筹备中\n\n这个项目还在酝酿阶段，等它长出来再和大家见面。\n\n敬请期待 :)",
       "gallery": [],
+      "status": "x",
+      "tags": [
+        "x",
+        "x"
+      ],
+      "icon": "terminal",
       "links": []
     }
   ]
