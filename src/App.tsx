@@ -13,11 +13,14 @@ import {
   Globe,
   Heart,
   Instagram,
+  ListMusic,
   Mail,
   Menu,
   Mic,
   Music,
   Palette,
+  Pause,
+  Play,
   Rocket,
   Rss,
   Sparkles,
@@ -350,7 +353,7 @@ function Hero({ site }: { site: Site }) {
         </div>
 
         {/* 底部统计（始终白色） */}
-        <div className="pb-7 pt-4">
+        <div className="pb-24 pt-4">
           <div className="font-sans flex flex-wrap items-center justify-center gap-x-4 gap-y-2 px-6 text-xs text-white/70 sm:text-sm">
             {site.stats.map((s, i) => (
               <Fragment key={i}>
@@ -532,7 +535,7 @@ function About({ site }: { site: Site }) {
 
 function Footer({ site }: { site: Site }) {
   return (
-    <footer className="border-t border-white/5 bg-[#06090c] py-10">
+    <footer className="border-t border-white/5 bg-[#06090c] pb-32 pt-10">
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-6 sm:flex-row sm:justify-between sm:px-10">
         <p className="font-sans text-xs text-white/40">
           {site.footerNote}
@@ -551,6 +554,196 @@ function Footer({ site }: { site: Site }) {
         </div>
       </div>
     </footer>
+  )
+}
+
+/* ============================================================
+   MusicPlayer —— 底部悬浮音乐播放器
+   ============================================================ */
+
+type LyricLine = { time: number; text: string }
+
+function parseLrc(raw: string): LyricLine[] {
+  const lines: LyricLine[] = []
+  const re = /\[(\d{1,2}):(\d{2})(?:\.(\d{1,3}))?\]/g
+  for (const line of raw.split('\n')) {
+    const times: number[] = []
+    re.lastIndex = 0
+    let m: RegExpExecArray | null
+    while ((m = re.exec(line)) !== null) {
+      const min = parseInt(m[1], 10)
+      const sec = parseInt(m[2], 10)
+      const frac = m[3] ? parseFloat(`0.${m[3]}`) : 0
+      times.push(min * 60 + sec + frac)
+    }
+    const text = line.replace(re, '').trim()
+    if (times.length && text) for (const t of times) lines.push({ time: t, text })
+  }
+  return lines.sort((a, b) => a.time - b.time)
+}
+
+function MusicPlayer() {
+  const [isPlaying, setIsPlaying] = useState(false)
+  const [currentTime, setCurrentTime] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [lyricsOpen, setLyricsOpen] = useState(false)
+  const [lyrics, setLyrics] = useState<LyricLine[]>([])
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const listRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const audio = new Audio('/music/departures.mp3')
+    audio.preload = 'metadata'
+    audioRef.current = audio
+
+    const onTime = () => {
+      setCurrentTime(audio.currentTime)
+      setDuration(audio.duration || 0)
+    }
+    const onEnded = () => setIsPlaying(false)
+    audio.addEventListener('timeupdate', onTime)
+    audio.addEventListener('loadedmetadata', onTime)
+    audio.addEventListener('ended', onEnded)
+
+    // 进站自动播放（浏览器可能拦截，拦截后用户首次点击页面任意处时重试）
+    const tryPlay = () => {
+      audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false))
+    }
+    tryPlay()
+    const onFirstInteraction = () => {
+      if (!audio.paused) return
+      tryPlay()
+    }
+    window.addEventListener('pointerdown', onFirstInteraction, { once: true })
+
+    fetch('/music/lyrics.lrc')
+      .then((r) => (r.ok ? r.text() : Promise.reject(new Error('lrc failed'))))
+      .then((t) => setLyrics(parseLrc(t)))
+      .catch(() => {})
+
+    return () => {
+      audio.pause()
+      audio.removeEventListener('timeupdate', onTime)
+      audio.removeEventListener('loadedmetadata', onTime)
+      audio.removeEventListener('ended', onEnded)
+      window.removeEventListener('pointerdown', onFirstInteraction)
+    }
+  }, [])
+
+  const toggle = () => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (audio.paused) {
+      audio.play().then(() => setIsPlaying(true)).catch(() => {})
+    } else {
+      audio.pause()
+      setIsPlaying(false)
+    }
+  }
+
+  const seek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const audio = audioRef.current
+    if (!audio || !audio.duration) return
+    const rect = e.currentTarget.getBoundingClientRect()
+    audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration
+  }
+
+  const activeIndex = lyrics.reduce((acc, l, i) => (l.time <= currentTime ? i : acc), -1)
+  const activeLine = activeIndex >= 0 ? lyrics[activeIndex] : null
+
+  // 歌词面板自动滚动到当前行
+  useEffect(() => {
+    if (lyricsOpen && listRef.current && activeIndex >= 0) {
+      const el = listRef.current.children[activeIndex] as HTMLElement | undefined
+      el?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    }
+  }, [activeIndex, lyricsOpen])
+
+  const fmt = (s: number) => `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`
+  const pct = duration ? Math.min(100, (currentTime / duration) * 100) : 0
+
+  return (
+    <>
+      {/* 歌词面板 */}
+      {lyricsOpen && (
+        <div className="fixed bottom-24 left-1/2 z-40 w-[min(92vw,30rem)] -translate-x-1/2">
+          <div className="liquid-glass rounded-3xl px-5 pb-3 pt-4">
+            <div className="flex items-center justify-between">
+              <p className="font-sans truncate text-xs text-white/55">
+                Departures 〜あなたにおくるアイの歌〜 · EGOIST
+              </p>
+              <button
+                onClick={() => setLyricsOpen(false)}
+                aria-label="关闭歌词"
+                className="ml-3 shrink-0 text-white/60 transition-colors hover:text-white"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div ref={listRef} className="mt-3 max-h-[40vh] space-y-2.5 overflow-y-auto pr-1">
+              {lyrics.map((l, i) => (
+                <p
+                  key={i}
+                  className={`font-sans text-sm leading-relaxed transition-colors duration-500 ${
+                    i === activeIndex ? 'text-champagne' : 'text-white/40'
+                  }`}
+                >
+                  {l.text}
+                </p>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 底部播放条 */}
+      <div className="fixed bottom-4 left-1/2 z-40 w-[min(94vw,26rem)] -translate-x-1/2">
+        <div className="liquid-glass relative flex items-center gap-3 rounded-full py-2 pl-2 pr-3">
+          {/* 进度条 */}
+          <div
+            onClick={seek}
+            className="absolute inset-x-3 top-0 h-[2px] cursor-pointer rounded-full bg-white/15"
+          >
+            <div
+              className="h-full rounded-full bg-champagne/80"
+              style={{ width: `${pct}%` }}
+            />
+          </div>
+
+          <button
+            onClick={toggle}
+            aria-label={isPlaying ? '暂停' : '播放'}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[#182c41] shadow-lg transition-transform duration-300 hover:scale-105 active:scale-95"
+          >
+            {isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
+          </button>
+
+          <div className="min-w-0 flex-1 text-left">
+            <p className="font-sans truncate text-[11px] text-white/55">
+              Departures 〜あなたにおくるアイの歌〜 · EGOIST
+            </p>
+            <p
+              key={activeIndex}
+              className="font-sans img-fade truncate text-sm text-white/90"
+            >
+              {activeLine?.text ?? (lyrics.length ? '…' : '点击播放')}
+            </p>
+          </div>
+
+          <button
+            onClick={() => setLyricsOpen((v) => !v)}
+            aria-label="歌词"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white/70 transition-colors hover:text-champagne"
+          >
+            {lyricsOpen ? <X size={16} /> : <ListMusic size={16} />}
+          </button>
+
+          <span className="font-sans hidden shrink-0 text-[10px] text-white/40 sm:block">
+            {fmt(currentTime)} / {fmt(duration)}
+          </span>
+        </div>
+      </div>
+    </>
   )
 }
 
@@ -585,6 +778,7 @@ export default function App() {
       <Projects items={projects} />
       <About site={site} />
       <Footer site={site} />
+      <MusicPlayer />
     </main>
   )
 }
