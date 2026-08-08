@@ -67,6 +67,25 @@ collections:
               - { label: 时间与地点, name: meta, widget: string, hint: "例如：昨天 15:04 · 街角的咖啡馆" }
               - { label: 标签, name: tag, widget: string, hint: "例如：☕ 日常" }
 
+  # ---------- 音乐 ----------
+  - name: songs
+    label: ④ 音乐 Songs
+    files:
+      - name: songs
+        label: 播放器歌曲列表（可增删）
+        file: public/data/songs.json
+        fields:
+          - label: 歌曲列表
+            name: items
+            widget: list
+            collapsed: false
+            hint: "第一首是默认播放曲目"
+            fields:
+              - { label: 歌名, name: name, widget: string }
+              - { label: 歌手, name: artist, widget: string }
+              - { label: 音频文件, name: audio, widget: file, hint: "上传 mp3（建议 10MB 以内）" }
+              - { label: 歌词文件, name: lyrics, widget: file, hint: "上传 .lrc 歌词文件（可选，留空则无歌词）" }
+
   # ---------- 项目 ----------
   - name: projects
     label: ③ 项目 Projects

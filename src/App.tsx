@@ -10,6 +10,8 @@ import {
   BookOpen,
   CalendarHeart,
   Camera,
+  ChevronLeft,
+  ChevronRight,
   Coffee,
   Feather,
   Github,
@@ -719,6 +721,7 @@ function ProjectDetail() {
    ============================================================ */
 
 type LyricLine = { time: number; text: string }
+type Song = { name: string; artist: string; audio: string; lyrics?: string }
 
 function parseLrc(raw: string): LyricLine[] {
   const lines: LyricLine[] = []
@@ -740,16 +743,49 @@ function parseLrc(raw: string): LyricLine[] {
 }
 
 function MusicPlayer() {
+  const [songs, setSongs] = useState<Song[]>([])
+  const [songIndex, setSongIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(false)
   const [currentTime, setCurrentTime] = useState(0)
   const [duration, setDuration] = useState(0)
   const [lyricsOpen, setLyricsOpen] = useState(false)
+  const [listOpen, setListOpen] = useState(false)
   const [lyrics, setLyrics] = useState<LyricLine[]>([])
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const listRef = useRef<HTMLDivElement>(null)
+  const lyricsPanelRef = useRef<HTMLDivElement>(null)
 
+  // 用 ref 镜像最新状态，供事件回调使用
+  const songsRef = useRef(songs)
+  songsRef.current = songs
+  const indexRef = useRef(songIndex)
+  indexRef.current = songIndex
+
+  const song = songs[songIndex]
+
+  // 加载指定歌曲（切歌核心：换音频 + 换歌词 + 尝试播放）
+  const loadSong = (i: number) => {
+    const audio = audioRef.current
+    const s = songsRef.current[i]
+    if (!audio || !s) return
+    setSongIndex(i)
+    setLyricsOpen(false)
+    setListOpen(false)
+    setCurrentTime(0)
+    audio.src = s.audio
+    audio.load()
+    setLyrics([])
+    if (s.lyrics) {
+      fetch(s.lyrics)
+        .then((r) => (r.ok ? r.text() : Promise.reject(new Error('lrc failed'))))
+        .then((t) => setLyrics(parseLrc(t)))
+        .catch(() => {})
+    }
+    audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false))
+  }
+
+  // 初始化 audio 与歌曲列表
   useEffect(() => {
-    const audio = new Audio('/music/departures.mp3')
+    const audio = new Audio()
     audio.preload = 'metadata'
     audioRef.current = audio
 
@@ -757,25 +793,42 @@ function MusicPlayer() {
       setCurrentTime(audio.currentTime)
       setDuration(audio.duration || 0)
     }
-    const onEnded = () => setIsPlaying(false)
+    const onEnded = () => {
+      // 播完自动切下一首
+      const n = songsRef.current.length
+      if (n > 1) {
+        loadSong((indexRef.current + 1) % n)
+      } else {
+        setIsPlaying(false)
+      }
+    }
     audio.addEventListener('timeupdate', onTime)
     audio.addEventListener('loadedmetadata', onTime)
     audio.addEventListener('ended', onEnded)
 
     // 进站自动播放（浏览器可能拦截，拦截后用户首次点击页面任意处时重试）
     const tryPlay = () => {
-      audio.play().then(() => setIsPlaying(true)).catch(() => setIsPlaying(false))
+      if (!audio.src) {
+        if (songsRef.current.length) loadSong(0)
+        return
+      }
+      audio.play().then(() => setIsPlaying(true)).catch(() => {})
     }
-    tryPlay()
     const onFirstInteraction = () => {
       if (!audio.paused) return
       tryPlay()
     }
     window.addEventListener('pointerdown', onFirstInteraction, { once: true })
 
-    fetch('/music/lyrics.lrc')
-      .then((r) => (r.ok ? r.text() : Promise.reject(new Error('lrc failed'))))
-      .then((t) => setLyrics(parseLrc(t)))
+    fetch('/data/songs.json')
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error('songs fetch failed'))))
+      .then((d) => {
+        if (Array.isArray(d?.items) && d.items.length) {
+          songsRef.current = d.items
+          setSongs(d.items)
+          loadSong(0) // 加载第一首并尝试自动播放
+        }
+      })
       .catch(() => {})
 
     return () => {
@@ -785,6 +838,7 @@ function MusicPlayer() {
       audio.removeEventListener('ended', onEnded)
       window.removeEventListener('pointerdown', onFirstInteraction)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const toggle = () => {
@@ -796,6 +850,12 @@ function MusicPlayer() {
       audio.pause()
       setIsPlaying(false)
     }
+  }
+
+  const stepSong = (dir: 1 | -1) => {
+    const n = songsRef.current.length
+    if (!n) return
+    loadSong((indexRef.current + dir + n) % n)
   }
 
   const seek = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -810,8 +870,8 @@ function MusicPlayer() {
 
   // 歌词面板自动滚动到当前行
   useEffect(() => {
-    if (lyricsOpen && listRef.current && activeIndex >= 0) {
-      const el = listRef.current.children[activeIndex] as HTMLElement | undefined
+    if (lyricsOpen && lyricsPanelRef.current && activeIndex >= 0) {
+      const el = lyricsPanelRef.current.children[activeIndex] as HTMLElement | undefined
       el?.scrollIntoView({ block: 'center', behavior: 'smooth' })
     }
   }, [activeIndex, lyricsOpen])
@@ -822,12 +882,12 @@ function MusicPlayer() {
   return (
     <>
       {/* 歌词面板 */}
-      {lyricsOpen && (
+      {lyricsOpen && song && (
         <div className="fixed bottom-24 left-1/2 z-40 w-[min(92vw,30rem)] -translate-x-1/2">
           <div className="liquid-glass rounded-3xl px-5 pb-3 pt-4">
             <div className="flex items-center justify-between">
               <p className="font-sans truncate text-xs text-white/55">
-                Departures 〜あなたにおくるアイの歌〜 · EGOIST
+                {song.name} · {song.artist}
               </p>
               <button
                 onClick={() => setLyricsOpen(false)}
@@ -837,16 +897,55 @@ function MusicPlayer() {
                 <X size={16} />
               </button>
             </div>
-            <div ref={listRef} className="mt-3 max-h-[40vh] space-y-2.5 overflow-y-auto pr-1">
-              {lyrics.map((l, i) => (
-                <p
-                  key={i}
-                  className={`font-sans text-sm leading-relaxed transition-colors duration-500 ${
-                    i === activeIndex ? 'text-champagne' : 'text-white/40'
+            <div ref={lyricsPanelRef} className="mt-3 max-h-[40vh] space-y-2.5 overflow-y-auto pr-1">
+              {lyrics.length ? (
+                lyrics.map((l, i) => (
+                  <p
+                    key={i}
+                    className={`font-sans text-sm leading-relaxed transition-colors duration-500 ${
+                      i === activeIndex ? 'text-champagne' : 'text-white/40'
+                    }`}
+                  >
+                    {l.text}
+                  </p>
+                ))
+              ) : (
+                <p className="font-sans py-4 text-center text-sm text-white/35">暂无歌词</p>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 歌曲列表面板 */}
+      {listOpen && (
+        <div className="fixed bottom-24 left-1/2 z-40 w-[min(92vw,24rem)] -translate-x-1/2">
+          <div className="liquid-glass rounded-3xl px-4 py-4">
+            <div className="flex items-center justify-between px-2">
+              <p className="font-sans text-xs text-white/50">播放列表 · {songs.length} 首</p>
+              <button
+                onClick={() => setListOpen(false)}
+                aria-label="关闭列表"
+                className="text-white/60 transition-colors hover:text-white"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="mt-2 max-h-[40vh] space-y-1 overflow-y-auto pr-1">
+              {songs.map((s, i) => (
+                <button
+                  key={s.audio}
+                  onClick={() => {
+                    loadSong(i)
+                    setListOpen(false)
+                  }}
+                  className={`font-sans flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left text-sm transition-colors duration-300 ${
+                    i === songIndex ? 'bg-white/10 text-champagne' : 'text-white/70 hover:bg-white/5 hover:text-white'
                   }`}
                 >
-                  {l.text}
-                </p>
+                  <span className="truncate">{s.name}</span>
+                  <span className="shrink-0 text-xs text-white/40">{s.artist}</span>
+                </button>
               ))}
             </div>
           </div>
@@ -854,8 +953,8 @@ function MusicPlayer() {
       )}
 
       {/* 底部播放条 */}
-      <div className="fixed bottom-4 left-1/2 z-40 w-[min(94vw,26rem)] -translate-x-1/2">
-        <div className="liquid-glass relative flex items-center gap-3 rounded-full py-2 pl-2 pr-3">
+      <div className="fixed bottom-4 left-1/2 z-40 w-[min(94vw,28rem)] -translate-x-1/2">
+        <div className="liquid-glass relative flex items-center gap-1.5 rounded-full py-2 pl-2 pr-3 sm:gap-2">
           {/* 进度条 */}
           <div
             onClick={seek}
@@ -868,31 +967,52 @@ function MusicPlayer() {
           </div>
 
           <button
+            onClick={() => stepSong(-1)}
+            aria-label="上一首"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white/70 transition-colors hover:text-white"
+          >
+            <ChevronLeft size={18} />
+          </button>
+          <button
             onClick={toggle}
             aria-label={isPlaying ? '暂停' : '播放'}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-[#182c41] shadow-lg transition-transform duration-300 hover:scale-105 active:scale-95"
           >
             {isPlaying ? <Pause size={16} /> : <Play size={16} className="ml-0.5" />}
           </button>
+          <button
+            onClick={() => stepSong(1)}
+            aria-label="下一首"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white/70 transition-colors hover:text-white"
+          >
+            <ChevronRight size={18} />
+          </button>
 
-          <div className="min-w-0 flex-1 text-left">
-            <p className="font-sans truncate text-[11px] text-white/55">
-              Departures 〜あなたにおくるアイの歌〜 · EGOIST
-            </p>
-            <p
-              key={activeIndex}
-              className="font-sans img-fade truncate text-sm text-white/90"
-            >
-              {activeLine?.text ?? (lyrics.length ? '…' : '点击播放')}
-            </p>
-          </div>
+          <button
+            onClick={() => setListOpen((v) => !v)}
+            aria-label="播放列表"
+            title="歌曲列表"
+            className="flex min-w-0 flex-1 items-center gap-2 rounded-full px-2 py-1.5 text-left transition-colors hover:bg-white/5"
+          >
+            <Music size={14} className="shrink-0 text-champagne" />
+            <span className="min-w-0">
+              <span className="font-sans block truncate text-[11px] text-white/55">
+                {song ? `${song.name} · ${song.artist}` : '加载中…'}
+              </span>
+              <span key={activeIndex} className="font-sans img-fade block truncate text-sm text-white/90">
+                {activeLine?.text ?? (isPlaying || currentTime > 0 ? '…' : '点击播放')}
+              </span>
+            </span>
+          </button>
 
           <button
             onClick={() => setLyricsOpen((v) => !v)}
             aria-label="歌词"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-white/70 transition-colors hover:text-champagne"
+            className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full transition-colors ${
+              lyricsOpen ? 'text-champagne' : 'text-white/70 hover:text-white'
+            }`}
           >
-            {lyricsOpen ? <X size={16} /> : <ListMusic size={16} />}
+            <ListMusic size={16} />
           </button>
 
           <span className="font-sans hidden shrink-0 text-[10px] text-white/40 sm:block">
