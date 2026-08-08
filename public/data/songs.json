@@ -5,6 +5,21 @@
       "artist": "EGOIST",
       "audio": "/music/departures.mp3",
       "lyrics": "/music/lyrics.lrc"
+    },
+    {
+      "name": "Travel",
+      "artist": "T-Chenxi",
+      "audio": "/music/travel.mp3"
+    },
+    {
+      "name": "double take",
+      "artist": "dhruv",
+      "audio": "/music/double-take.mp3"
+    },
+    {
+      "name": "起风了",
+      "artist": "吴青峰",
+      "audio": "/music/qifengle.mp3"
     }
   ]
 }
